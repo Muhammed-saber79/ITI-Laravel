@@ -2,73 +2,63 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Post;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 class PostsController extends Controller
 {
-    // Posts Array...
-    public $postsArr = [
-        [
-            'id'=>1,
-            'title'=>'Post From Ahmed',
-            'decsription'=>'this is the first post from ahmed...',
-            'posted_by'=>'Ahmed',
-            'created_at'=>'2023-04-01 01:01:01'
-        ],
-        [
-            'id'=>2,
-            'title'=>'Post From Muhammed',
-            'decsription'=>'this is the first post from muhammed...',
-            'posted_by'=>'Muhammed',
-            'created_at'=>'2023-04-01 02:01:01'
-        ],
-        [
-            'id'=>3,
-            'title'=>'Post From Majed',
-            'decsription'=>'this is the first post from majed...',
-            'posted_by'=>'Majed',
-            'created_at'=>'2023-04-01 03:01:01'
-        ]
-    ];
-
     // Index Action...
     function index(){
-        return view('posts.index' , ['posts'=>$this->postsArr]);
+        $data = DB::table('posts')->join('users','users.id','=','posts.user_id')->select('posts.id','posts.title','posts.description','posts.created_at','users.name as post_creator')->orderBy('posts.id')->get(); 
+        return view('posts.index' , ['data'=>$data]);
     }
 
     // Create Action...
     function create(){
-        return view('posts.create');
+        $users = User::all();
+        return view('posts.create' , ['users'=>$users]);
     }
 
     // Store Action...
-    function store(){
-        return redirect()->route('posts.index');
+    function store(Request $request){
+        $newPost = Post::create([
+            'title'=>$request->title,
+            'description'=>$request->description,
+            'user_id'=>$request->post_creator,
+        ]);
+        return redirect()->route('posts.index')->with('status','Post Created Successfully.');
     }
 
     // Show Action...
     function show($id){
-        $post=[];
-        foreach($this->postsArr as $current_post){
-            if($current_post['id'] == $id){
-                $post = $current_post;
-            }
-        }
-        return view('posts.show' , ['post'=>$post]);
+        $postData = DB::table('posts')->join('users','users.id','=','posts.user_id')->select('posts.id','posts.title','posts.description','posts.created_at','users.name as post_creator')->orderBy('posts.id')->where('posts.id','=',$id)->get(); 
+        return view('posts.show' , ['post'=>$postData[0]]);
     }
 
     // Edit Action...
     function edit($id){
-        return view('posts.edit',['post'=>$id]);
+        $users = User::all();
+        $postData = DB::table('posts')->join('users','users.id','=','posts.user_id')->select('posts.id','posts.title','posts.description','posts.user_id','posts.created_at','users.name as post_creator')->orderBy('posts.id')->where('posts.id','=',$id)->get(); 
+        return view('posts.edit' , ['post'=>$postData[0] , 'users'=>$users]);
     }
 
     // Update Action...
-    function update($id){
+    function update($id , Request $request){
+        $postUpdate = Post::findOrFail($id);
+
+        Post::where('id',$id)->update([
+            'title'=>$request->title,
+            'description'=>$request->description,
+        ]);
         return redirect()->route('posts.index')->with('status','Post Updated Successfully.');
     }
 
     // Destroy Action...
     function destroy($id){
-        return redirect()->route('posts.index')->with('danger','Are You Sure?');
+        $postDelete = Post::destroy($id);
+        
+        return redirect()->route('posts.index')->with('danger','Post Deleted Successfully.');
     }
 }

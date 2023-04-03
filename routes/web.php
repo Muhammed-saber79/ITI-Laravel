@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostsController;
+use App\Http\Controllers\UsersController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -20,3 +21,5 @@ Route::get('/posts/{post_id}' , [PostsController::class , 'show'])->name('posts.
 Route::get('/posts/edit/{post_id}' , [PostsController::class , 'edit'])->name('posts.edit');
 Route::put('/posts/{post_id}' , [PostsController::class , 'update'])->name('posts.update');
 Route::delete('/posts/{post_id}' , [PostsController::class , 'destroy'])->name('posts.destroy');
+
+Route::get('/users' , [UsersController::class , 'index'])->name('users.index');

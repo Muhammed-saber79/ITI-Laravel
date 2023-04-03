@@ -1,9 +1,6 @@
-<?php
-use Carbon\carbon
-?>
 @extends('layouts.app')
 
-@section('title') Index @endsection
+@section('title') Users Index @endsection
 
 @section('content')
 
@@ -46,31 +43,25 @@ use Carbon\carbon
             <caption>Table Name</caption>
             <tr>
                 <th>#</th>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Posted By</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Password</th>
                 <th>Created At</th>
                 <th>Action</th>
             </tr>
             </thead>
             <tbody class="table-group-divider">
-                @foreach($data as $post)
+                @foreach($users as $user)
                 <tr class="table-primary" >
-                    <td scope="row">{{ $post->id }}</td>
-                    <td>{{ $post->title }}</td>
-                    <td>{{ $post->description }}</td>
-                    <td>{{ $post->post_creator }}</td>
-                    <td>
-                        <?php
-                        $date = Carbon::parse($post->created_at);
-
-                        echo $date->diffForHumans();
-                        ?>
-                    </td>
-                    <td class="d-flex align-items-center">
-                        <a href="{{ route('posts.show', $post->id) }}" class="btn btn-info mx-2">Show</a>
-                        <a href="{{ route('posts.edit', $post->id) }}" class="btn btn-primary mx-2">Edit</a>
-                        <form action="{{ route('posts.destroy', $post->id) }}" method="POST" class="mx-2 delBtn">
+                    <td scope="row">{{ $user->id }}</td>
+                    <td>{{ $user->name }}</td>
+                    <td>{{ $user->email }}</td>
+                    <td>{{ $user->password }}</td>
+                    <td>{{ $user->created_at }}</td>
+                    <td class="d-flex flex-row">
+                        <a href="{{ route('posts.show', $user->id) }}" class="btn btn-info mx-2">Show</a>
+                        <a href="{{ route('posts.edit', $user->id) }}" class="btn btn-primary mx-2">Edit</a>
+                        <form action="{{ route('posts.destroy', $user->id) }}" method="POST" class="mx-2 delBtn">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-danger">Delete</button>
@@ -80,6 +71,7 @@ use Carbon\carbon
                 @endforeach
             </tbody>
             <tfoot>
+                
             </tfoot>
     </table>
 </div>
