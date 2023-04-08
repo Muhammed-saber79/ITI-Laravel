@@ -23,3 +23,6 @@ Route::put('/posts/{post_id}' , [PostsController::class , 'update'])->name('post
 Route::delete('/posts/{post_id}' , [PostsController::class , 'destroy'])->name('posts.destroy');
 
 Route::get('/users' , [UsersController::class , 'index'])->name('users.index');
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

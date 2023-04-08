@@ -6,12 +6,14 @@ use App\Models\Post;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use App\Http\Requests\StorePostRequest;
 
 class PostsController extends Controller
 {
     // Index Action...
     function index(){
-        $data = DB::table('posts')->join('users','users.id','=','posts.user_id')->select('posts.id','posts.title','posts.description','posts.created_at','users.name as post_creator')->orderBy('posts.id')->get(); 
+        // $data = DB::table('posts')->join('users','users.id','=','posts.user_id')->select('posts.id','posts.title','posts.description','posts.created_at','users.name as post_creator')->orderBy('posts.id')->paginate(10); 
+        $data = Post::with(['user'])->paginate(7);
         return view('posts.index' , ['data'=>$data]);
     }
 
@@ -22,7 +24,7 @@ class PostsController extends Controller
     }
 
     // Store Action...
-    function store(Request $request){
+    function store(StorePostRequest $request){
         $newPost = Post::create([
             'title'=>$request->title,
             'description'=>$request->description,
@@ -45,7 +47,7 @@ class PostsController extends Controller
     }
 
     // Update Action...
-    function update($id , Request $request){
+    function update($id , StorePostRequest $request){
         $postUpdate = Post::findOrFail($id);
 
         Post::where('id',$id)->update([
@@ -57,8 +59,16 @@ class PostsController extends Controller
 
     // Destroy Action...
     function destroy($id){
-        $postDelete = Post::destroy($id);
+        $postDelete = Post::findOrFail($id);
         
-        return redirect()->route('posts.index')->with('danger','Post Deleted Successfully.');
+        try{
+            if($postDelete->delete()){
+                return redirect()->route('posts.index')->with('danger','Post Deleted Successfully.');
+            }else{
+                return redirect()->route('posts.index')->with('danger','Can not Find This Post...!');
+            }
+        }catch(Exception $error){
+            return redirect()->route('posts.index')->with('danger','Can not Delete This Post...!');
+        }
     }
 }

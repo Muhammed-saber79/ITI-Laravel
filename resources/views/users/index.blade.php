@@ -75,6 +75,9 @@
             </tfoot>
     </table>
 </div>
+<div class="d-flex justify-content-center mb-5">
+    {{ $users->links("pagination::bootstrap-5") }}
+</div>
 
 <script>
     let delBtn = document.querySelectorAll(".delBtn");

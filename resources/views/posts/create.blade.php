@@ -3,6 +3,19 @@
 @section('title') Create Post @endsection
 
 @section('content')
+
+<div class="w-75 m-auto my-5">
+  @if ($errors->any())
+      <div class="alert alert-danger">
+          <ul>
+              @foreach ($errors->all() as $error)
+                  <li>{{ $error }}</li>
+              @endforeach
+          </ul>
+      </div>
+  @endif
+</div>
+
 <h3 class="mt-3 text-center">Here U Can Create New Post...</h3>
 <hr class="m-auto w-50">
 <form action="{{ route('posts.store') }}" method="POST" class="m-auto w-75 mt-5">

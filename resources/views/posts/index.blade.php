@@ -12,13 +12,6 @@ use Carbon\carbon
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         {{ session('status') }}
     </div>
-
-    <script>
-        var alertList = document.querySelectorAll('.alert');
-        alertList.forEach(function (alert) {
-        new bootstrap.Alert(alert)
-        })
-    </script>
 @endif
 
 @if(session('danger'))
@@ -26,13 +19,6 @@ use Carbon\carbon
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         {{ session('danger') }}
     </div>
-
-    <script>
-        var alertList = document.querySelectorAll('.alert');
-        alertList.forEach(function (alert) {
-        new bootstrap.Alert(alert)
-        })
-    </script>
 @endif
 
 <div class="table-responsive mt-5 text-center">
@@ -59,7 +45,7 @@ use Carbon\carbon
                     <td scope="row">{{ $post->id }}</td>
                     <td>{{ $post->title }}</td>
                     <td>{{ $post->description }}</td>
-                    <td>{{ $post->post_creator }}</td>
+                    <td>{{ $post->user->name }}</td>
                     <td>
                         <?php
                         $date = Carbon::parse($post->created_at);
@@ -70,11 +56,7 @@ use Carbon\carbon
                     <td class="d-flex align-items-center">
                         <a href="{{ route('posts.show', $post->id) }}" class="btn btn-info mx-2">Show</a>
                         <a href="{{ route('posts.edit', $post->id) }}" class="btn btn-primary mx-2">Edit</a>
-                        <form action="{{ route('posts.destroy', $post->id) }}" method="POST" class="mx-2 delBtn">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger">Delete</button>
-                        </form>
+                        <button class="btn btn-danger delete" data-id="{{ $post->id }}" data-bs-toggle="modal" data-bs-target="#confirm-delete">Delete</button>
                     </td>
                 </tr>
                 @endforeach
@@ -83,15 +65,42 @@ use Carbon\carbon
             </tfoot>
     </table>
 </div>
+<div class="d-flex justify-content-center mb-5">
+    {{ $data->links("pagination::bootstrap-5") }}
+</div>
+
+<!-- Confirm Delete -->
+<div class="modal fade" id="confirm-delete" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        U are about To <span class="fs-5 text-danger">DELETE</span> This Post, Are U Sure?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <form action="/posts/" method="POST" class="mx-2" id="delete-form">   <!-- onsubmit="confirmDelete(event)" -->
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-danger">Confirm Delete</button>  <!-- onclick="confirmDelete(event)" -->
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Confirm Delete -->
 
 <script>
-    let delBtn = document.querySelectorAll(".delBtn");
-    for(i in delBtn){
-        delBtn[i].addEventListener('submit',function(event){
-        if(!window.confirm("Are U Sure U Want To Delete This Record?")){
-            event.preventDefault();
-        }
+    $(document).ready(function(){
+        $(".delete").on('click',function(){
+            var post_id = $(this).data('id');
+            $("#delete-form").attr('action','/posts/'+post_id);
+            $("#confirm-delete").modal('show');
+        })
     })
-    }
 </script>
+
 @endsection
